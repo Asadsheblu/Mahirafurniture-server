@@ -18,12 +18,13 @@ async function run() {
     try {
         await client.connect();
         const Productcollection=client.db("mahirafu").collection("product-item")
-       app.get('/product',async(req,res)=>{
+       app.get('/inventory',async(req,res)=>{
         const query={}
         const result=Productcollection.find(query)
         const item=await result.toArray()
         res.send(item)
        })
+     
 
     }
     finally{
