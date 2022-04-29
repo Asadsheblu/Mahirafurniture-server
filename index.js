@@ -24,7 +24,20 @@ async function run() {
         const item=await result.toArray()
         res.send(item)
        })
-     
+       //specific item find
+       app.get('/inventory/:id',async(req,res)=>{
+           const id=req.params.id ;
+           const query={_id:ObjectId(id)}
+           const result=await Productcollection.findOne(query)
+           res.send(result)
+       })
+     //add new item
+     app.post('/inventory',async(req,res)=>{
+         const doc =req.body;
+         const result=await Productcollection.insertOne(doc)
+         res.send(result)
+         
+     })
 
     }
     finally{
