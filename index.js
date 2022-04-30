@@ -38,6 +38,14 @@ async function run() {
          res.send(result)
          
      })
+     //my item
+     app.get('/myItem',async(req,res)=>{
+         const  email=req.query.email
+         const query={email}
+         const cursor=Productcollection.find(query)
+         const myItem=await cursor.toArray()
+         res.send(myItem)
+     })
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
          const id=req.params.id;
