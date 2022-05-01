@@ -41,6 +41,17 @@ async function run() {
          res.send(result)
          
      })
+     //my item
+     app.get('/myitem',async(req,res)=>{
+       
+            
+            const query=req.body
+            const cursor=Productcollection.find(query)
+            const result=await cursor.toArray()
+            res.send(result)
+           })
+           
+        
      
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
