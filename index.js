@@ -12,20 +12,22 @@ app.use(express.json());
 app.get('/',(req,res)=>{
     res.send("Hello Mahira furiture backend sever")
 })
-function verifyJWT(req,res,next){
-    const authHeader=req.headers.authorizarion
-    if(!authHeader){
-        return res.status(401).send({message:"unauthorized access"})
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'unauthorized access' });
     }
-    const token=authHeader.spilt(' ')[1]
-    jwt.verify(token, process.env.ACCESS_TOKEN,(err,decoded)=>{
-        if(err){
-            return res.status(403).send({message : "forbidden access"})
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden access' });
         }
-        req.decoded=decoded
+        console.log('decoded', decoded);
+        req.decoded = decoded;
+        next();
     })
-    next();
 }
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7auxx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
@@ -36,7 +38,7 @@ async function run() {
         app.post('/signIn',async(req,res)=>{
             const user=req.body
             const accessToken=jwt.sign(user,process.env.ACCESS_TOKEN,{
-                expiresIn:"2d"
+                expiresIn: '1d'
             })
             res.send(accessToken)
         })
@@ -62,16 +64,16 @@ async function run() {
      })
      //my item
      app.get('/myItem',verifyJWT,async(req,res)=>{
-         const decoded=req.decoded.email
-         const  email=req.query.email
-         if(email===decoded){
+        const decodedEmail = req.decoded.email;
+        const email = req.query.email;
+         if(email===decodedEmail){
             const query={email}
             const cursor=Productcollection.find(query)
             const myItem=await cursor.toArray()
             res.send(myItem)
          }
          else{
-         res.status(403).send({message: 'invalid user'})
+            res.status(403).send({message: 'forbidden access'})
          }
      })
      //delete specific item
