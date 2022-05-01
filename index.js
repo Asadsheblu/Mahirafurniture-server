@@ -1,6 +1,6 @@
 const express=require("express")
 const app=express()
-const jwt = require('jsonwebtoken');
+
 require('dotenv').config()
 const cors=require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -8,10 +8,8 @@ const { query } = require('express')
 app.use(cors())
 const port = process.env.PORT || 5000;
 app.use(express.json());
-
-
 app.get('/',(req,res)=>{
-    res.send("Hello Mahira furiture backend sever")
+    res.send("HelloMahira furiture backend sever")
 })
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7auxx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -20,7 +18,6 @@ async function run() {
     try {
         await client.connect();
         const Productcollection=client.db("mahirafu").collection("product-item")
-        
        app.get('/inventory',async(req,res)=>{
         const query={}
         const result=Productcollection.find(query)
@@ -42,17 +39,13 @@ async function run() {
          
      })
      //my item
-     app.get('/myitem',async(req,res)=>{
-       
-            
-            const query=req.body
-            const cursor=Productcollection.find(query)
-            const result=await cursor.toArray()
-            res.send(result)
-           })
-           
-        
-     
+     app.get('/myItem',async(req,res)=>{
+         const  email=req.query.email
+         const query={email}
+         const cursor=Productcollection.find(query)
+         const myItem=await cursor.toArray()
+         res.send(myItem)
+     })
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
          const id=req.params.id;
