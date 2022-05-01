@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 function verifyJWT(req,res,next){
     const authHeader=req.headers.authorization
-    if(authHeader){
+    if(!authHeader){
         return res.status(401).send({message:"unauthorized access"})
     }
     const token=authHeader.split(' ')[1];
