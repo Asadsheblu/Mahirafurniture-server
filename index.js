@@ -21,10 +21,10 @@ async function run() {
         //auth
         app.post('/signIn',async(req,res)=>{
             const user=req.body
-            const token=jwt.sign(user,process.env.ACCESS_TOKEN,{
+            const accessToken=jwt.sign(user,process.env.ACCESS_TOKEN,{
                 expiresIn:"2d"
             })
-            res.send(token)
+            res.send(accessToken)
         })
        app.get('/inventory',async(req,res)=>{
         const query={}
