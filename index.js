@@ -8,22 +8,7 @@ const { query } = require('express')
 app.use(cors())
 const port = process.env.PORT || 5000;
 app.use(express.json());
-function verifyJWT(req,res,next){
-    const authHeader=req.headers.authorization
-    if(!authHeader){
-        return res.status(401).send({message:"unauthorized access"})
-    }
-    const tokens=authHeader.split(' ')[1];
-    jwt.verify(tokens,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
-        if(err){
-            return res.status(403).send({message:"forbidden access"})
-        }
-        console.log(decoded);
-        req.decoded=decoded
-    })
-    
-    next()
-}
+
 
 app.get('/',(req,res)=>{
     res.send("Hello Mahira furiture backend sever")
@@ -35,15 +20,7 @@ async function run() {
     try {
         await client.connect();
         const Productcollection=client.db("mahirafu").collection("product-item")
-        //auth
-        app.post('/token',async(req,res)=>{
-           
-            const user=req.body
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,{
-                expiresIn:"1d"
-            });
-            res.send({token})
-        })
+        
        app.get('/inventory',async(req,res)=>{
         const query={}
         const result=Productcollection.find(query)
@@ -64,21 +41,7 @@ async function run() {
          res.send(result)
          
      })
-     //my item
-     app.get('/myitem',verifyJWT,async(req,res)=>{
-        const decodedEmail=req.decoded.email
-            const email=req.query.email
-           if(email===decodedEmail){
-            const query={email:email}
-            const cursor=Productcollection.find(query)
-            const result=await cursor.toArray()
-            res.send(result)
-           }
-           else{
-            return res.status(403).send({message: "forbidden access"})
-           }
-        
-     })
+     
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
          const id=req.params.id;
