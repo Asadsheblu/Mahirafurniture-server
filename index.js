@@ -9,8 +9,8 @@ app.use(cors())
 const port = process.env.PORT || 5000;
 app.use(express.json());
 function verifyJWT(req,res,next){
-    const authHeader = req.headers.authorization;
-    if(!authHeader){
+    const authHeader=req.headers.authorization
+    if(authHeader){
         return res.status(401).send({message:"unauthorized access"})
     }
     const token=authHeader.split(' ')[1];
@@ -38,7 +38,8 @@ async function run() {
         //auth
         app.post('/token',async(req,res)=>{
            
-            const user=req.body.email
+           console.log(authHeader);
+            const user=req.body
             const token = jwt.sign(user, process.env.ACCESS_TOKEN,{
                 expiresIn:"1d"
             });
