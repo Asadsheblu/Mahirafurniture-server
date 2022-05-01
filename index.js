@@ -65,7 +65,7 @@ async function run() {
          
      })
      //my item
-     app.get('/myItem',verifyJWT,async(req,res)=>{
+     app.get('/myitem',verifyJWT,async(req,res)=>{
         const decodedEmail=req.decoded.email
             const email=req.query.email
            if(email===decodedEmail){
