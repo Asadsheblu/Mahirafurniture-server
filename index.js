@@ -13,15 +13,15 @@ function verifyJWT(req,res,next){
     if(!authHeader){
         return res.status(401).send({message:"unauthorized access"})
     }
-    const token=authHeader.split(' ')[1];
-    jwt.verify(token,process.env.ACCESS_TOKEN,(err,decoded)=>{
+    const tokens=authHeader.split(' ')[1];
+    jwt.verify(tokens,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
         if(err){
             return res.status(403).send({message:"forbidden access"})
         }
         console.log(decoded);
         req.decoded=decoded
     })
-    console.log(authHeader);
+    
     next()
 }
 
@@ -38,9 +38,8 @@ async function run() {
         //auth
         app.post('/token',async(req,res)=>{
            
-           console.log(authHeader);
             const user=req.body
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN,{
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,{
                 expiresIn:"1d"
             });
             res.send({token})
@@ -71,12 +70,12 @@ async function run() {
             const email=req.query.email
            if(email===decodedEmail){
             const query={email:email}
-            const orderResult=Productcollection.find(query)
-            const result=await orderResult.toArray()
+            const cursor=Productcollection.find(query)
+            const result=await cursor.toArray()
             res.send(result)
            }
            else{
-            return res.status(403).send({message:"forbidden access"})
+            return res.status(403).send({message: "forbidden access"})
            }
         
      })
