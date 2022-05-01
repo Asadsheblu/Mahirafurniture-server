@@ -38,7 +38,7 @@ async function run() {
         //auth
         app.post('/token',async(req,res)=>{
            
-            const user=req.body
+            const user=req.body.email
             const token = jwt.sign(user, process.env.ACCESS_TOKEN,{
                 expiresIn:"1d"
             });
