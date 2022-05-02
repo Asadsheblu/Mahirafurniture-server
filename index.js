@@ -2,16 +2,31 @@ const express=require("express")
 const app=express()
 const jwt = require('jsonwebtoken');
 require('dotenv').config()
-const cors=require('cors');
+const cors = require("cors");
+app.use(cors());
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express')
-app.use(cors())
+
 const port = process.env.PORT || 5000;
 app.use(express.json());
 app.get('/',(req,res)=>{
     res.send("HelloMahira furiture backend sever")
 })
-
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorize Access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden Access' })
+        }
+        console.log('decoded', decoded);
+        req.decoded = decoded;
+    })
+    next();
+}
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7auxx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
@@ -19,13 +34,12 @@ async function run() {
         await client.connect();
         const Productcollection=client.db("mahirafu").collection("product-item")
         //auth
-        app.post('/token',async(req,res)=>{
-            
-                const user=req.body;
-                const accessToken=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{
-                    expiresIn:"5d"
-                })
-                res.send({accessToken})
+        app.post('/token', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1d'
+            });
+            res.send({ accessToken })
         })
         //api
        app.get('/inventory',async(req,res)=>{
@@ -36,7 +50,7 @@ async function run() {
        })
        //specific item find
        app.get('/inventory/:id',async(req,res)=>{
-           const id=req.params.id ;
+           const id=(req.params.id).trim();
            const query={_id:ObjectId(id)}
            const result=await Productcollection.findOne(query)
            res.send(result)
@@ -49,29 +63,21 @@ async function run() {
          
      })
      //my item
-     app.get('/myItem',async(req,res)=>{
-        const authHedaer=req.headers.authorization.split(' ')[1]
-       console.log(authHedaer);
-       const userEmail=req.query.email
-       let decodedEmail
-       jwt.verify(authHedaer, process.env.ACCESS_TOKEN_SECRET, function(err, decoded) {
-           if(err){
-              return  res.status(403).send("Forbidden Access")
-           }
-            decodedEmail=decoded.email
-        
-      });
-      if(decodedEmail===userEmail){
-        const  email=req.query.email
-        const query={email}
-        const cursor= Productcollection.find(query)
-        const myItem=await cursor.toArray()
-        res.send(myItem)
-    }
-     })
+     app.get('/myItem', verifyJWT, async (req, res) => {
+        const decodedEmail = req.decoded.email;
+        const email = req.query.email;
+        if (email === decodedEmail) {
+            const query = { email: email };
+            const cursor = Productcollection.find(query);
+            const myItem = await cursor.toArray();
+            res.send(myItem);
+        } else {
+            res.status(403).send({ message: 'Forbidden Access' })
+        }
+    })
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
-         const id=req.params.id;
+         const id=(req.params.id).trim() ;
          const query={_id:ObjectId(id)}
          const result = await Productcollection.deleteOne(query);
          res.send(result)
@@ -79,7 +85,7 @@ async function run() {
      })
      //update specific item
      app.put('/inventory/:id',async(req,res)=>{
-         const id=req.params.id 
+         const id=(req.params.id).trim() 
          
          const updateUser=req.body
          const filter ={_id:ObjectId(id)}
