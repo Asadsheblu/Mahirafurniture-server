@@ -7,7 +7,7 @@ app.use(cors());
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express')
 
-const port = process.env.PORT;
+const port = process.env.PORT ||5000;
 app.use(express.json());
 app.get('/',(req,res)=>{
     res.send("HelloMahira furiture backend sever")
