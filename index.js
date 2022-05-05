@@ -96,7 +96,7 @@ async function run() {
                 quantity: updatedQuantity
             }
         };
-        const result = await ProductCollection.updateOne(filter, updatedDoc, options);
+        const result = await Productcollection.updateOne(filter, updatedDoc, options);
             console.log(updatedDoc);
             res.send(result);
 
