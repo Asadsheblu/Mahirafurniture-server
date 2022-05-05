@@ -7,7 +7,7 @@ app.use(cors());
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express')
 
-const port = process.env.PORT || 4300;
+const port = process.env.PORT || 8000;
 app.use(express.json());
 app.get('/',(req,res)=>{
     res.send("HelloMahira furiture backend sever")
@@ -63,9 +63,10 @@ async function run() {
          
      })
      //my item
-     app.get('/myItem', verifyJWT, async (req, res) => {
+     app.get('/myitem', verifyJWT, async (req, res) => {
         const decodedEmail = req.decoded.email;
         const email = req.query.email;
+        console.log(email);
         if (email === decodedEmail) {
             const query = { email: email };
             const cursor = Productcollection.find(query);
@@ -77,7 +78,7 @@ async function run() {
     })
      //delete specific item
      app.delete('/inventory/:id',async(req,res)=>{
-         const id=(req.params.id).trim() ;
+         const id=req.params.id;
          const query={_id:ObjectId(id)}
          const result = await Productcollection.deleteOne(query);
          res.send(result)
@@ -97,7 +98,7 @@ async function run() {
             }
         };
         const result = await Productcollection.updateOne(filter, updatedDoc, options);
-            console.log(updatedDoc);
+            
             res.send(result);
 
         })
