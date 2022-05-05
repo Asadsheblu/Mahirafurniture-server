@@ -7,7 +7,7 @@ app.use(cors());
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { query } = require('express')
 
-const port = process.env.PORT ||5000;
+const port = process.env.PORT || 4300;
 app.use(express.json());
 app.get('/',(req,res)=>{
     res.send("HelloMahira furiture backend sever")
@@ -50,7 +50,7 @@ async function run() {
        })
        //specific item find
        app.get('/inventory/:id',async(req,res)=>{
-           const id=(req.params.id).trim();
+           const id=(req.params.id);
            const query={_id:ObjectId(id)}
            const result=await Productcollection.findOne(query)
            res.send(result)
