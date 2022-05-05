@@ -84,22 +84,23 @@ async function run() {
 
      })
      //update specific item
-     app.put('/inventory/:id',async(req,res)=>{
-         const id=(req.params.id).trim() 
-         
-         const updateUser=req.body
-         const filter ={_id:ObjectId(id)}
-         
-         const options = { upsert: true };
-         const updateDoc = {
+     app.put('/inventory/:id', async (req, res) => {
+        const id = req.params.id;
+        const updatedQuantity = req.body.updatedQuantity;
+        console.log(updatedQuantity);
+        const filter = { _id: ObjectId(id) };
+        console.log(filter);
+        const options = { upsert: true };
+        const updatedDoc = {
             $set: {
-              quantity:updateUser-quantity
-            },
-          };
-          const result = await Productcollection.updateOne(filter, updateDoc,options);
-          res.send(result)
+                quantity: updatedQuantity
+            }
+        };
+        const result = await productCollection.updateOne(filter, updatedDoc, options);
+            console.log(updatedDoc);
+            res.send(result);
 
-     })
+        })
 
     }
     finally{
